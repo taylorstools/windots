@@ -1,12 +1,13 @@
 @echo off
 
 :CHECK_CONNECTION
-echo Checking internet connection...
 ping -n 1 google.com >nul 2>&1
 if errorlevel 1 (
     echo No Internet connection detected.
     echo Connect to a network. Checking again in 5 seconds...
-    timeout /t 5
+    timeout /t 4 >nul 2>&1
+    cls
+    timeout /t 1 >nul 2>&1
     goto CHECK_CONNECTION
 )
 
