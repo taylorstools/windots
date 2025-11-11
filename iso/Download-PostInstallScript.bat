@@ -10,6 +10,10 @@ if errorlevel 1 (
     goto CHECK_CONNECTION
 )
 
+if not exist "C:\PostInstall" (
+    mkdir "C:\PostInstall"
+)
+
 :: URL of the post-install script on GitHub
 set "URL=https://raw.githubusercontent.com/taylorstools/windots/refs/heads/main/postinstall/Run-PostInstallScript.ps1"
 
