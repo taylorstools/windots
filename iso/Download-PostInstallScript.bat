@@ -1,5 +1,6 @@
 @echo off
 
+:: Check there is an Internet connection, if not, loop until there is one
 :CHECK_CONNECTION
 ping -n 1 google.com >nul 2>&1
 if errorlevel 1 (
@@ -18,15 +19,17 @@ if not exist "C:\PostInstall" (
 :: URL of the post-install script on GitHub
 set "URL=https://raw.githubusercontent.com/taylorstools/windots/refs/heads/main/postinstall/Run-PostInstallScript.ps1"
 
-:: Destination path (in the current directory or temp)
+:: Where the script will be downloaded to
 set "SCRIPT=C:\PostInstall\Run-PostInstallScript.ps1"
 
 :: Set %POWERSHELL% to full path
 set "POWERSHELL=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
 
+:: Download the post-install script
 %POWERSHELL% -NoProfile -ExecutionPolicy Bypass -Command ^
     "Invoke-WebRequest -Uri '%URL%' -OutFile '%SCRIPT%'"
 
+:: Run the script if it exists
 if exist "%SCRIPT%" (
     %POWERSHELL% -NoProfile -ExecutionPolicy Bypass -Command ^
     "Start-Process %POWERSHELL% -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"%SCRIPT%\"' -Verb RunAs"
