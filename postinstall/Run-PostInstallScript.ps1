@@ -1,0 +1,3 @@
+Write-Host "Test"
+""
+pause
