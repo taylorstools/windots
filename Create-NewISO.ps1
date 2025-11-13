@@ -43,7 +43,8 @@ function Get-FileName ($InitialDirectory) {
     $OpenFileDialog.InitialDirectory = $initialDirectory
     $OpenFileDialog.Filter = "ISO Files (*.iso)|*.iso"
     $OpenFileDialog.Multiselect = $false #Ensure only one file can be selected
-    if ($OpenFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+    $Result = $OpenFileDialog.ShowDialog()
+    if ($Result -eq [System.Windows.Forms.DialogResult]::OK) {
         return $OpenFileDialog.FileName
     } else {
         return $null #Return null if no file is selected
@@ -85,12 +86,12 @@ do {
 
 ""
 #Cleanup stale wims if any are mounted
-Write-Host -ForegroundColor Green "Cleaning up any stale mounted images..."
+Write-Host -ForegroundColor DarkGray "Cleaning up any stale mounted images..."
 dism /cleanup-wim
 
 ""
 #Create directories
-Write-Host -ForegroundColor Green "Creating scratch directories..."
+Write-Host -ForegroundColor DarkGray "Creating scratch directories..."
 if (Test-Path -Path "C:\ScratchDir") {
     Remove-Item "C:\ScratchDir" -Recurse -Force
 }
@@ -102,7 +103,7 @@ $BootWorkspace = (New-Item -Path "$ScratchDir\BootWorkspace" -ItemType Directory
 #Install 7-Zip if it's not installed
 if (!(Test-Path -Path "$env:ProgramFiles\7-Zip\7z.exe")) {
     ""
-    Write-Host -ForegroundColor Green "Installing 7-Zip..."
+    Write-Host -ForegroundColor DarkGray "Installing 7-Zip..."
 
     #Install 7-Zip
     winget install --accept-source-agreements --accept-package-agreements --id=7zip.7zip -e
@@ -110,7 +111,7 @@ if (!(Test-Path -Path "$env:ProgramFiles\7-Zip\7z.exe")) {
 
 ""
 #Use 7-Zip to extract Windows ISO
-Write-Host -ForegroundColor Green "Extracting Windows ISO to scratch directory: $ExtractedISO..."
+Write-Host -ForegroundColor DarkGray "Extracting Windows ISO to scratch directory: $ExtractedISO..."
 & ${env:ProgramFiles}\7-Zip\7z.exe x $WindowsISO "-o$($ExtractedISO)" -y 2> $null | Out-Null
 
 #Determine if install.wim or install.esd
@@ -133,17 +134,19 @@ $Date = Get-Date -Format "MM-dd-yy"
 
 #Mount install.wim
 ""
-Write-Host -ForegroundColor Green "Mounting $InstallWIM to $Workspace..."
+Write-Host -ForegroundColor DarkGray "Mounting $InstallWIM to $Workspace..."
 Mount-WindowsImage -ImagePath "$InstallWIM" -Path "$Workspace" -Index 1
 
-Write-Host -ForegroundColor Green "Applying default app associations..."
+Write-Host -ForegroundColor DarkGray "Applying default app associations..."
 #Copy default apps XML
 Save-GitHubFiles -Files @("iso/AppAssociations.xml") -DownloadDirectory "$ScratchDir"
 
 #Import default apps XML
 Dism /Image:$Workspace /Import-DefaultAppAssociations:$ScratchDir\AppAssociations.xml
 
-Write-Host -ForegroundColor Green "Disabling UAC..."
+""
+Write-Host -ForegroundColor DarkGray "Disabling UAC..."
+""
 #Load registry hive
 reg load HKLM\WIN11OFFLINE $Workspace\Windows\System32\Config\SOFTWARE
 #Disable UAC
@@ -157,7 +160,7 @@ reg unload HKLM\WIN11OFFLINE
 Save-GitHubFiles -Files @("iso/Download-PostInstallScript.bat") -DownloadDirectory "$Workspace\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
 
 ""
-Write-Host -ForegroundColor Green "Cleaning up C:\ folders on wim..."
+Write-Host -ForegroundColor DarkGray "Cleaning up C:\ folders on wim..."
 $Folders = @(
     "AMD",
     "Config.msi",
@@ -181,7 +184,7 @@ foreach ($Folder in $Folders) {
 }
 
 ""
-Write-Host -ForegroundColor Green "Saving changes and unmounting $InstallWIM..."
+Write-Host -ForegroundColor DarkGray "Saving changes and unmounting $InstallWIM..."
 #Dismount Image
 Dismount-WindowsImage -Path $Workspace -Save
 
@@ -192,9 +195,8 @@ Remove-Item $Workspace -Recurse -Force
 
 #region Export Windows Setup index from boot.wim
 
-""
 #Export the Microsoft Windows Setup index from the boot.wim
-Write-Host -ForegroundColor Green "Exporting just the Windows Setup index from the Windows ISO boot.wim..."
+Write-Host -ForegroundColor DarkGray "Exporting just the Windows Setup index from the Windows ISO boot.wim..."
 
 #Get index # of boot.wim
 $BootIndex = (Get-WindowsImage -ImagePath "$ExtractedISO\sources\boot.wim" | Where-Object { $_.ImageName -like "*Microsoft Windows Setup*" }).ImageIndex
@@ -206,12 +208,11 @@ dism /export-image /SourceImageFile:"$ExtractedISO\sources\boot.wim" /SourceInde
 
 ""
 #Modify boot.wim
-Write-Host -ForegroundColor Green "Mounting $ScratchDir\boot.wim to $BootWorkspace..."
+Write-Host -ForegroundColor DarkGray "Mounting $ScratchDir\boot.wim to $BootWorkspace..."
 ""
 Mount-WindowsImage -ImagePath "$ScratchDir\boot.wim" -Path "$BootWorkspace" -Index 1
 
-""
-Write-Host -ForegroundColor Green "Renaming setup.exe inside Windows Setup..."
+Write-Host -ForegroundColor DarkGray "Renaming setup.exe inside Windows Setup..."
 #Rename setup.exe in boot.wim
 Rename-Item -Path "$BootWorkspace\setup.exe" -NewName "setup-custom.exe"
 
@@ -221,7 +222,7 @@ if (Test-Path -Path "$Startnet") { Remove-Item "$Startnet" -Force }
 Save-GitHubFiles -Files @("iso/startnet.cmd") -DownloadDirectory "$BootWorkspace\Windows\System32"
 
 ""
-Write-Host -ForegroundColor Green "Saving changes and unmounting modified boot.wim..."
+Write-Host -ForegroundColor DarkGray "Saving changes and unmounting modified boot.wim..."
 #Dismount Image
 Dismount-WindowsImage -Path $BootWorkspace -Save
 
@@ -229,7 +230,7 @@ Dismount-WindowsImage -Path $BootWorkspace -Save
 Remove-Item $BootWorkspace -Recurse -Force
 
 #Copy modified wim to extracted ISO directory
-Write-Host -ForegroundColor Green "Replacing stock boot.wim with modified one in extracted Windows ISO directory: $ExtractedISO..."
+Write-Host -ForegroundColor DarkGray "Replacing stock boot.wim with modified one in extracted Windows ISO directory: $ExtractedISO..."
 Remove-Item "$ExtractedISO\sources\boot.wim" -Force
 Move-Item -Path "$ScratchDir\boot.wim" -Destination "$ExtractedISO\sources\boot.wim"
 
@@ -247,20 +248,20 @@ Save-GitHubFiles -Files @("iso/oscdimg.exe") -DownloadDirectory "$ScratchDir"
 $oscdimg = "$ScratchDir\oscdimg.exe"
 $ISOPath = "$env:USERPROFILE\Desktop\WinDots $OSNameandBuild $Date.iso"
 
-Write-Host -ForegroundColor Green "Creating ISO..."
+Write-Host -ForegroundColor DarkGray "Creating ISO..."
 $oscdimgCommand = "$oscdimg -m -o -u2 -udfver102 -bootdata:2#p0,e,b$ExtractedISO\boot\etfsboot.com#pEF,e,b$ExtractedISO\efi\microsoft\boot\efisys.bin $ExtractedISO `"$ISOPath`""
 Start-Process "cmd.exe" -ArgumentList "/c `"$oscdimgCommand`"" -Wait
 
 ""
-Write-Host -ForegroundColor Green "ISO successfully created at $ISOPath."
+Write-Host -ForegroundColor DarkGray "ISO successfully created at $ISOPath."
 
 ""
-Write-Host -ForegroundColor Green "Cleaning up..."
+Write-Host -ForegroundColor DarkGray "Cleaning up..."
 #Remove WIMPrep Folder
 Remove-Item $ScratchDir -Recurse -Force
 
 ""
-Write-Host -ForegroundColor Green "Done."
+Write-Host -ForegroundColor DarkGray "Done."
 ""
 
 pause

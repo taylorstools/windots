@@ -29,7 +29,8 @@ echo ============================================
 echo(
 echo Rebooting in 5 seconds.
 
-timeout /t 5 >nul 2>&1
+:: Timeout in WinPE
+ping -n 6 127.0.0.1 >nul 2>&1
 
 :: Reboot
 wpeutil reboot
