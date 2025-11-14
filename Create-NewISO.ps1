@@ -1,10 +1,10 @@
 #Set title
-$Host.UI.RawUI.WindowTitle = "Windots Windows ISO Creation"
+$Host.UI.RawUI.WindowTitle = "Windots ISO Creation"
 $Host.UI.RawUI.BackgroundColor = "black"
 Clear-Host
 
 Write-Host "============================================"
-Write-Host "========== CREATE NEW WINDOWS ISO =========="
+Write-Host "=========== wINDOTS ISO CREATION ==========="
 Write-Host "============================================"
 ""
 
