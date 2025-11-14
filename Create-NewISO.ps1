@@ -1,4 +1,4 @@
-﻿Write-Host "Test" | Out-Null
+Write-Host "Test" | Out-Null
 $Host.UI.RawUI.WindowTitle = "Windots Windows ISO Creation"
 $Host.UI.RawUI.BackgroundColor = "black"
 #Clear-Host
@@ -277,3 +277,4 @@ Write-Host -ForegroundColor Green "Done."
 pause
 
 #endregion Create ISO
+
