@@ -1,7 +1,6 @@
-﻿#Set title
-$Host.ui.RawUI.WindowTitle = "Windots Windows ISO Creation"
+﻿$Host.ui.RawUI.WindowTitle = "Windots Windows ISO Creation"
 $Host.UI.RawUI.BackgroundColor = "black"
-Clear-Host
+#Clear-Host
 
 #region Functions
 
