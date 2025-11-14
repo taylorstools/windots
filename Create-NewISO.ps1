@@ -8,6 +8,21 @@ Write-Host "========== CREATE NEW WINDOWS ISO =========="
 Write-Host "============================================"
 ""
 
+#region Check if Admin
+
+$CurrentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+$Principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+
+if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host -ForegroundColor Red "Not running as admin."
+    Write-Host "Relaunch this script as an administrator."
+    ""
+    pause
+    exit
+}
+
+#endregion Check if Admin
+
 #region Functions
 
 #Function to download files from the Windots GitHub repo
@@ -61,7 +76,7 @@ function Get-FileName ($InitialDirectory) {
 #region User Input
 
 #Have user select their Windows 11 ISO
-Write-Host "Select your NTLite Windows 11 .ISO file..." -ForegroundColor Black -BackgroundColor Yellow
+Write-Host -ForegroundColor Black -BackgroundColor Yellow "Select your NTLite Windows 11 .ISO file..."
 Start-Sleep 2
 
 $WindowsISO = $null
@@ -282,6 +297,3 @@ Write-Host -ForegroundColor Green "Done."
 pause
 
 #endregion Create ISO
-
-
-
