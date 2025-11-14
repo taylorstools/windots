@@ -1,4 +1,5 @@
-﻿$Host.ui.RawUI.WindowTitle = "Windots Windows ISO Creation"
+﻿Write-Host "Test" | Out-Null
+$Host.UI.RawUI.WindowTitle = "Windots Windows ISO Creation"
 $Host.UI.RawUI.BackgroundColor = "black"
 #Clear-Host
 
