@@ -4,7 +4,7 @@ $Host.UI.RawUI.BackgroundColor = "black"
 Clear-Host
 
 Write-Host "============================================"
-Write-Host "=========== wINDOTS ISO CREATION ==========="
+Write-Host "=========== WINDOTS ISO CREATION ==========="
 Write-Host "============================================"
 ""
 
