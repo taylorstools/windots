@@ -245,11 +245,21 @@ Save-GitHubFiles -Files @("iso/autounattend.xml") -DownloadDirectory "$Extracted
 #Download oscdimg
 Save-GitHubFiles -Files @("iso/oscdimg.exe") -DownloadDirectory "$ScratchDir"
 
-$oscdimg = "$ScratchDir\oscdimg.exe"
-$ISOPath = "$env:USERPROFILE\Desktop\WinDots $OSNameandBuild $Date.iso"
+#Directory ISO file will be saved to
+$Dir = "$env:USERPROFILE\Desktop"
+#Construct file name
+$ISOName = "WinDots $OSNameandBuild $Date"
+#Construct full path to ISO file
+$ISOPath = "$Dir\$ISOName.iso"
+$Counter = 2
+#Construct a different ISO path if file already exists
+while (Test-Path -Path $ISOPath) {
+    $ISOPath = Join-Path $Dir ("$ISOName $Counter.iso")
+    $Counter++
+}
 
 Write-Host -ForegroundColor DarkGray "Creating ISO..."
-$oscdimgCommand = "$oscdimg -m -o -u2 -udfver102 -bootdata:2#p0,e,b$ExtractedISO\boot\etfsboot.com#pEF,e,b$ExtractedISO\efi\microsoft\boot\efisys.bin $ExtractedISO `"$ISOPath`""
+$oscdimgCommand = "$ScratchDir\oscdimg.exe -m -o -u2 -udfver102 -bootdata:2#p0,e,b$ExtractedISO\boot\etfsboot.com#pEF,e,b$ExtractedISO\efi\microsoft\boot\efisys.bin $ExtractedISO `"$ISOPath`""
 Start-Process "cmd.exe" -ArgumentList "/c `"$oscdimgCommand`"" -Wait
 
 ""
@@ -261,7 +271,7 @@ Write-Host -ForegroundColor DarkGray "Cleaning up..."
 Remove-Item $ScratchDir -Recurse -Force
 
 ""
-Write-Host -ForegroundColor DarkGray "Done."
+Write-Host -ForegroundColor Green "Done."
 ""
 
 pause
