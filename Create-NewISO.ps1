@@ -107,7 +107,7 @@ do {
 ""
 #Cleanup stale wims if any are mounted
 Write-Host -ForegroundColor DarkGray "Cleaning up any stale mounted images..."
-dism /cleanup-wim
+Dism /Cleanup-Wim
 
 ""
 #Create directories
@@ -220,7 +220,7 @@ Write-Host -ForegroundColor DarkGray "Exporting just the Windows Setup index fro
 
 #Get index # of boot.wim
 $BootIndex = (Get-WindowsImage -ImagePath "$ExtractedISO\sources\boot.wim" | Where-Object { $_.ImageName -like "*Microsoft Windows Setup*" }).ImageIndex
-dism /export-image /SourceImageFile:"$ExtractedISO\sources\boot.wim" /SourceIndex:$BootIndex /DestinationImageFile:"$ScratchDir\boot.wim" /Compress:max /CheckIntegrity
+Dism /Export-Image /SourceImageFile:"$ExtractedISO\sources\boot.wim" /SourceIndex:$BootIndex /DestinationImageFile:"$ScratchDir\boot.wim" /Compress:Max /CheckIntegrity
 
 #endregion Export Windows Setup index from boot.wim
 
@@ -297,3 +297,4 @@ Write-Host -ForegroundColor Green "Done."
 pause
 
 #endregion Create ISO
+
