@@ -90,7 +90,7 @@ $Requirements = @(
         Detail = "Install 7-Zip from https://www.7-zip.org and re-run."
     },
     @{
-        Name   = "Free disk space on $env:SystemDrive"
+        Name   = "Free disk space on $env:SystemDrive\"
         Met    = $FreeGB -ge $RequiredFreeGB
         Detail = "Need roughly $RequiredFreeGB GB; only $FreeGB GB available."
     }
