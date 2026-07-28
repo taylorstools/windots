@@ -78,7 +78,7 @@ foreach ($Path in $SevenZipCandidates) {
 }
 
 # Extracted ISO + exported wim + mounted image + output ISO all live on the system drive
-$RequiredFreeGB = 35
+$RequiredFreeGB = 30
 $FreeGB = [math]::Round(
     (Get-PSDrive -Name $env:SystemDrive.TrimEnd(":")).Free / 1GB, 1
 )
