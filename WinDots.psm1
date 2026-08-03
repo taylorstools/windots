@@ -260,6 +260,13 @@ function Write-Heading {
     $BoldOn  = if ($SupportsVT) { "$ESC[1m" } else { "" }
     $BoldOff = if ($SupportsVT) { "$ESC[0m" } else { "" }
 
+    $TopLeft     = [char]0x256D
+    $TopRight    = [char]0x256E
+    $BottomLeft  = [char]0x2570
+    $BottomRight = [char]0x256F
+    $Horizontal  = [char]0x2500
+    $Vertical    = [char]0x2502
+
     # Flatten any embedded newlines into individual lines
     $Lines = $Message -split "`r?`n"
 
@@ -267,8 +274,8 @@ function Write-Heading {
     $MaxLength = ($Lines | Measure-Object -Property Length -Maximum).Maximum
     $Width = $MaxLength + ($Padding * 2)
 
-    $TopBorder    = "╭" + ("─" * $Width) + "╮"
-    $BottomBorder = "╰" + ("─" * $Width) + "╯"
+    $TopBorder    = "$TopLeft" + ("$Horizontal" * $Width) + "$TopRight"
+    $BottomBorder = "$BottomLeft" + ("$Horizontal" * $Width) + "$BottomRight"
 
     Write-Host ""
     Write-Host "$BoldOn$TopBorder$BoldOff" -ForegroundColor $BorderColor
@@ -276,9 +283,9 @@ function Write-Heading {
         $RightPad  = $MaxLength - $Line.Length
         $InnerText = (" " * $Padding) + $Line + (" " * $RightPad) + (" " * $Padding)
 
-        Write-Host "$BoldOn│$BoldOff"          -ForegroundColor $BorderColor -NoNewline
-        Write-Host "$BoldOn$InnerText$BoldOff" -ForegroundColor $TextColor   -NoNewline
-        Write-Host "$BoldOn│$BoldOff"          -ForegroundColor $BorderColor
+        Write-Host "$BoldOn$Vertical$BoldOff"    -ForegroundColor $BorderColor -NoNewline
+        Write-Host "$BoldOn$InnerText$BoldOff"   -ForegroundColor $TextColor   -NoNewline
+        Write-Host "$BoldOn$Vertical$BoldOff"    -ForegroundColor $BorderColor
     }
     Write-Host "$BoldOn$BottomBorder$BoldOff" -ForegroundColor $BorderColor
 }
